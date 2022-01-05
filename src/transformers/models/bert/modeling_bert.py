@@ -172,6 +172,11 @@ class BertEmbeddings(nn.Module):
         self.position_embeddings = nn.Embedding(config.max_position_embeddings, config.hidden_size)
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size)
 
+        #! ADDED
+        #! nn.Embedding(max_number_of_pos_tags, config.hidden_size)
+        #! max_number_of_pos_tags = total number of labels
+        self.pos_tag_embeddings = nn.Embedding(20, config.hidden_size)
+
         # self.LayerNorm is not snake-cased to stick with TensorFlow model variable name and be able to load
         # any TensorFlow checkpoint file
         self.LayerNorm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
@@ -213,6 +218,9 @@ class BertEmbeddings(nn.Module):
         if inputs_embeds is None:
             inputs_embeds = self.word_embeddings(input_ids)
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
+
+        #! ADDED
+        pos_tag_embeddings = self.pos_tag_embeddings(pos_tag_ids)
 
         embeddings = inputs_embeds + token_type_embeddings
         if self.position_embedding_type == "absolute":
@@ -896,6 +904,7 @@ class BertModel(BertPreTrainedModel):
         input_ids=None,
         attention_mask=None,
         token_type_ids=None,
+        pos_tag_ids=None, #! ADDED
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
@@ -990,6 +999,7 @@ class BertModel(BertPreTrainedModel):
             input_ids=input_ids,
             position_ids=position_ids,
             token_type_ids=token_type_ids,
+            pos_tag_ids=pos_tag_ids, #! ADDED
             inputs_embeds=inputs_embeds,
             past_key_values_length=past_key_values_length,
         )
@@ -1725,6 +1735,7 @@ class BertForTokenClassification(BertPreTrainedModel):
         input_ids=None,
         attention_mask=None,
         token_type_ids=None,
+        pos_tag_ids=None, #! ADDED
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
@@ -1743,6 +1754,7 @@ class BertForTokenClassification(BertPreTrainedModel):
             input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
+            pos_tag_ids=pos_tag_ids, #! ADDED
             position_ids=position_ids,
             head_mask=head_mask,
             inputs_embeds=inputs_embeds,
