@@ -190,9 +190,9 @@ class BertEmbeddings(nn.Module):
                 torch.zeros(self.position_ids.size(), dtype=torch.long),
                 persistent=False,
             )
-
+    #! ADDED pos_tag_ids=None
     def forward(
-        self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, past_key_values_length=0
+        self, input_ids=None, pos_tag_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, past_key_values_length=0
     ):
         if input_ids is not None:
             input_shape = input_ids.size()
@@ -221,8 +221,8 @@ class BertEmbeddings(nn.Module):
 
         #! ADDED
         pos_tag_embeddings = self.pos_tag_embeddings(pos_tag_ids)
-
-        embeddings = inputs_embeds + token_type_embeddings
+        #! ADDED + pos_tag_embeddings
+        embeddings = inputs_embeds + token_type_embeddings + pos_tag_embeddings
         if self.position_embedding_type == "absolute":
             position_embeddings = self.position_embeddings(position_ids)
             embeddings += position_embeddings
