@@ -173,9 +173,9 @@ class BertEmbeddings(nn.Module):
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size)
 
         #! ADDED
-        #! nn.Embedding(max_number_of_pos_tags, config.hidden_size)
-        #! max_number_of_pos_tags = total number of labels
-        self.pos_tag_embeddings = nn.Embedding(20, config.hidden_size)
+        #! nn.Embedding(extra_tag_vocab_size, config.hidden_size)
+        #! extra_tag_vocab_size = total number of labels
+        self.extra_tag_embeddings = nn.Embedding(config.extra_tag_vocab_size, config.hidden_size)
 
         # self.LayerNorm is not snake-cased to stick with TensorFlow model variable name and be able to load
         # any TensorFlow checkpoint file
@@ -190,9 +190,9 @@ class BertEmbeddings(nn.Module):
                 torch.zeros(self.position_ids.size(), dtype=torch.long),
                 persistent=False,
             )
-    #! ADDED pos_tag_ids=None
+    #! ADDED extra_tag_ids=None
     def forward(
-        self, input_ids=None, pos_tag_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, past_key_values_length=0
+        self, input_ids=None, extra_tag_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, past_key_values_length=0
     ):
         if input_ids is not None:
             input_shape = input_ids.size()
@@ -220,9 +220,9 @@ class BertEmbeddings(nn.Module):
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
 
         #! ADDED
-        pos_tag_embeddings = self.pos_tag_embeddings(pos_tag_ids)
-        #! ADDED + pos_tag_embeddings
-        embeddings = inputs_embeds + token_type_embeddings + pos_tag_embeddings
+        extra_tag_embeddings = self.extra_tag_embeddings(extra_tag_ids)
+        #! ADDED + extra_tag_embeddings
+        embeddings = inputs_embeds + token_type_embeddings + extra_tag_embeddings
         if self.position_embedding_type == "absolute":
             position_embeddings = self.position_embeddings(position_ids)
             embeddings += position_embeddings
@@ -904,7 +904,7 @@ class BertModel(BertPreTrainedModel):
         input_ids=None,
         attention_mask=None,
         token_type_ids=None,
-        pos_tag_ids=None, #! ADDED
+        extra_tag_ids=None, #! ADDED
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
@@ -999,7 +999,7 @@ class BertModel(BertPreTrainedModel):
             input_ids=input_ids,
             position_ids=position_ids,
             token_type_ids=token_type_ids,
-            pos_tag_ids=pos_tag_ids, #! ADDED
+            extra_tag_ids=extra_tag_ids, #! ADDED
             inputs_embeds=inputs_embeds,
             past_key_values_length=past_key_values_length,
         )
@@ -1735,7 +1735,7 @@ class BertForTokenClassification(BertPreTrainedModel):
         input_ids=None,
         attention_mask=None,
         token_type_ids=None,
-        pos_tag_ids=None, #! ADDED
+        extra_tag_ids=None, #! ADDED
         position_ids=None,
         head_mask=None,
         inputs_embeds=None,
@@ -1754,7 +1754,7 @@ class BertForTokenClassification(BertPreTrainedModel):
             input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
-            pos_tag_ids=pos_tag_ids, #! ADDED
+            extra_tag_ids=extra_tag_ids, #! ADDED
             position_ids=position_ids,
             head_mask=head_mask,
             inputs_embeds=inputs_embeds,
